@@ -13,6 +13,10 @@ var Prowl = require('node-prowl');
 var prowl = new Prowl(settings.PROWL_API_KEY);
     prowl.timeout = 60000;
 
+if(settings.TWILIO_ENABLED) {
+    var twilio = require('twilio')(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN);
+}
+
 console.log("Starting!");
 console.log("Wait_on: " + settings.WAIT_ON);
 console.log("Target directory: " + settings.TARGET_DIR);
@@ -67,7 +71,7 @@ function main() {
 
                        deleteFile(files[i]);
 
-                       if(settings.PROWL_ENABLED) {
+                       if(settings.PROWL_ENABLED || settings.TWILIO_ENABLED) {
                            var messageToSend = '';
                            var eventDescription = event.CID.getEventDescription();
 
@@ -91,10 +95,27 @@ function main() {
                            console.log(messageToSend);
                            console.log("===========================================");
 
-                           prowl.push(messageToSend, settings.ALARM_NAME, function( err, remaining ){
-                               if( err ) throw err; // TODO Fix this throw, alternative flow must be accessible when prowl does not work! (ETIMEDOUT)
-                               console.log( 'Remaining PROWL API calls for the current hour: ' + remaining);
-                           });
+                           if(settings.PROWL_ENABLED) {
+                               prowl.push(messageToSend, settings.ALARM_NAME, function( err, remaining ){
+                                   if( err ) console.log('ERROR: ' + err.message);
+                                   console.log( 'Message sent: ' + files[this.i]);
+                                   console.log( 'Remaining PROWL API calls for the current hour: ' + remaining);
+                               }.bind( {i: i}));
+                           }
+                           if(settings.TWILIO_ENABLED) {
+                               twilio.sendMessage({
+                                   to:settings.TWILIO_TO,
+                                   from:settings.TWILIO_FROM,
+                                   body:messageToSend
+                               }, function(err, responseData) {
+                                   if (!err) {
+                                       console.log("========= Twilio sent a message ===========");
+                                       console.log(responseData.from);
+                                       console.log(responseData.body);
+                                       console.log("===========================================");
+                                   }
+                               });
+                           }
                        }
                    }
                    else if(files[i] != '.id') {

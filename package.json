@@ -21,6 +21,7 @@
     "url" : "https://github.com/exsilium/alarm-notifier.git"
   },
   "dependencies": {
-    "node-prowl": "0.1.x"
+    "node-prowl": "0.1.x",
+    "twilio": "1.6.x"
   }
 }
