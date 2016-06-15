@@ -1,16 +1,18 @@
 {
   "name": "alarm-notifier",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Jablotron Alarm Receiver Centre messages handler and notifier",
   "main": "alarm-notifier.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node alarm-notifier.js"
   },
   "keywords": [
     "jablotron",
     "alarm",
     "ademco",
     "cid",
+    "arc",
     "notify",
     "cli"
   ],
@@ -21,7 +23,11 @@
     "url" : "https://github.com/exsilium/alarm-notifier.git"
   },
   "dependencies": {
+    "squirrel": "1.0.x"
+  },
+  "pluginDependencies": {
     "node-prowl": "0.1.x",
-    "twilio": "1.6.x"
+    "twilio": "1.6.x",
+    "pushover-notifications": "0.2.x"
   }
 }

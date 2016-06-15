@@ -4,17 +4,44 @@
 
 var settings = require('./settings');
 var fs = require('fs');
-var util = require('util');
+var squirrel = require('squirrel');
 var spawn = require('child_process').spawn;
+
+var prowl;
+var twilio;
+var pushover;
+
 
 var Event = require('./event');
 
-var Prowl = require('node-prowl');
-var prowl = new Prowl(settings.PROWL_API_KEY);
-    prowl.timeout = 60000;
+if(settings.PROWL_ENABLED) {
+    squirrel('node-prowl', { allowInstall: true }, function(err) {
+        if(err) throw err;
+
+        var Prowl = require('node-prowl');
+        prowl = new Prowl(settings.PROWL_API_KEY);
+        prowl.timeout = 60000;
+    });
+}
 
 if(settings.TWILIO_ENABLED) {
-    var twilio = require('twilio')(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN);
+    squirrel('twilio', { allowInstall: true }, function(err) {
+        if(err) throw err;
+
+        twilio = require('twilio')(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN);
+    });
+}
+
+if(settings.PUSHOVER_ENABLED) {
+    squirrel('pushover-notifications', { allowInstall: true}, function(err) {
+        if(err) throw err;
+
+        var Pushover = require('pushover-notifications');
+        pushover = new Pushover( {
+            user: settings.PUSHOVER_TO,
+            token: settings.PUSHOVER_API_KEY
+        });
+    })
 }
 
 console.log("Starting!");
@@ -58,7 +85,7 @@ function main() {
 
                        // Do the main magic for the file
                        var msg = fs.readFileSync(settings.TARGET_DIR + '/' + files[i]);
-                       console.log("Message received: " + msg.slice(0, msg.length - 1));
+                       console.log("Message received: " + msg.slice(0, msg.length));
 
                        var event = new Event(String(msg));
                        event.CID.nicePrint();
@@ -71,7 +98,7 @@ function main() {
 
                        deleteFile(files[i]);
 
-                       if(settings.PROWL_ENABLED || settings.TWILIO_ENABLED) {
+                       if(settings.PROWL_ENABLED || settings.TWILIO_ENABLED || settings.PUSHOVER_ENABLED) {
                            var messageToSend = '';
                            var eventDescription = event.CID.getEventDescription();
 
@@ -89,7 +116,7 @@ function main() {
                                messageToSend += 'UNKNOWN: ';
                            }
 
-                           messageToSend += event.receiverTStamp + ' ' + eventDescription.summaryTxt + ' (' + eventDescription.alarmType + ') - ' + eventDescription.descTxt;
+                           messageToSend += event.receiverTStamp + ' ' + eventDescription.summaryTxt + ' (' + eventDescription.alarmType + ') - ' + eventDescription.descTxt + ' (Partition: ' + event.CID.partition + '; Zone: ' + event.CID.zone + ')';
 
                            console.log("====== Sending the following message ======");
                            console.log(messageToSend);
@@ -98,8 +125,10 @@ function main() {
                            if(settings.PROWL_ENABLED) {
                                prowl.push(messageToSend, settings.ALARM_NAME, function( err, remaining ){
                                    if( err ) console.log('ERROR: ' + err.message);
+                                   console.log("========= Prowl sent a message ===========");
                                    console.log( 'Message sent: ' + files[this.i]);
                                    console.log( 'Remaining PROWL API calls for the current hour: ' + remaining);
+                                   console.log("===========================================");
                                }.bind( {i: i}));
                            }
                            if(settings.TWILIO_ENABLED) {
@@ -110,11 +139,25 @@ function main() {
                                }, function(err, responseData) {
                                    if (!err) {
                                        console.log("========= Twilio sent a message ===========");
-                                       console.log(responseData.from);
-                                       console.log(responseData.body);
+                                       console.log( responseData );
                                        console.log("===========================================");
                                    }
                                });
+                           }
+                           if(settings.PUSHOVER_ENABLED) {
+                               var pushover_msg = {
+                                   title: settings.ALARM_NAME,
+                                   message: messageToSend
+                               };
+
+                               pushover.send(pushover_msg, function(err, result) {
+                                   if(err) console.log('ERROR: ' + err.message)
+                                   else {
+                                       console.log("========= Pushover sent a message ===========");
+                                       console.log( result );
+                                       console.log("===========================================");
+                                   }
+                               })
                            }
                        }
                    }

@@ -317,13 +317,13 @@ const eventDescriptions = {
 // Constructor
 function CID(rawCID) {
     /*=======================================================================================================
-     The object is instantiated from Ademco Contact ID string
+     The object is instantiated from Ademco Contact ID block
      Based on the SIA DC-05-1999.09 Protocol specification
      The CID consists of the following parts:
      AAAA MM Q EEE PP ZZZ
      1. Account number or Subscriber ID
      2. Message Type = 18
-     3. Event Qualifier - 1 = New Event or Opening; 3 = New Restore or Closing; 6 = Previously reported condition
+     3. Event Qualifier - 1 = New Event or Operning; 3 = New Restore or Closing; 6 = Previously reported condition
      4. Event Code
      5. Partition number
      6. Zone number
@@ -334,7 +334,7 @@ function CID(rawCID) {
         console.log("ERROR: Invalid length of the raw contact ID code received, expected 15 but received " + rawCID.length);
         return;
     }
-    if(rawCID.substring(4, 6) != "18") {
+    if(rawCID.substring(4, 6) !="18") {
         console.log("ERROR: Invalid CID received, only accepting Message Type 18. Received: " + rawCID.substring(4, 6));
         return;
     }
@@ -360,10 +360,9 @@ CID.prototype.nicePrint = function() {
     console.log("+---------+-------+--------+-------+-----------+------+");
     console.log("|   " + this.accountID + "  |   18  |    " + this.eventQualifier + "   |  " + this.eventCode + "  |       " + this.partition + "  |  " + this.zone + " |");
     console.log("+---------+-------+--------+-------+-----------+------+");
-    console.log("|  Event summary  | " + eventDescriptions[this.eventCode].summaryTxt);
-    console.log("|   Event type    | " + eventDescriptions[this.eventCode].alarmType);
-    console.log("|Event description| " + eventDescriptions[this.eventCode].descTxt);
-    console.log("+-----------------+");
+    console.log("Event summary: " + eventDescriptions[this.eventCode].summaryTxt);
+    console.log("Event type: " + eventDescriptions[this.eventCode].alarmType);
+    console.log("Event description: " + eventDescriptions[this.eventCode].descTxt);
 };
 // export the class
 module.exports = CID;
