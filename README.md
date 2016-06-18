@@ -1,8 +1,6 @@
 # Synopsis #
 
-Alarm-notifier enables processing MSG* files from [Jablotron](http://www.jablotron.com) Alarm Receiver Center (`jaga-cored`). Write those files to a single log file, translate the Contact ID event and sends out human-readable notification using [node-prowl](https://github.com/arnklint/node-prowl).
-
-Alarm-notifier relies on `wait_on` implementation for directory changes based on kqueue. There is no polling for filesystem changes. However, `wait_on` is not available on all platforms so alternative watcher method should be used if that's the case.
+Alarm-notifier enables processing MSG* files from [Jablotron](http://www.jablotron.com) Alarm Receiver Center (`jaga-cored`). Write those files to a single log file, translate the Contact ID event and sends out human-readable notification using [node-prowl](https://github.com/arnklint/node-prowl), [pushover-notifications](https://github.com/qbit/node-pushover) or [twilio](https://github.com/twilio/twilio-node).
 
 Use this at your own risk.
 
@@ -12,7 +10,6 @@ Use this at your own risk.
 
  * Node 0.10.x and `npm`
  * access to `jaga-cored` writable spool files
- * `wait_on` system tool for spool directory monitoring
 
 ## Setup
 
@@ -22,13 +19,20 @@ Use this at your own risk.
 
 ### Edit settings.js
 
- * `WAIT_ON = "/usr/local/bin/wait_on"` - specify the location of `wait_on` system tool
  * `TARGET_DIR = "/var/spool/jaga-cored"` - the spool directory which contains the MSG* files as written by `jaga-cored`
  * `LOGFILE = "/var/log/jablotron.log"` - a file which gets the MSG file contents appended
- * `ALARM_NAME = "Alarm"` - used in Prowl notification as the App name or title of the notification
- * `PROWL_API_KEY = ""` - enter your Prowl API keys here, a comma separated list
- * `PROWL_ENABLED = false` - change this to true to enable alert sending
  * `DELETE_ENABLED = false` - change this to true to enable deletion of the MSG files. Use false for testing out alarm-notifier
+ * `ALARM_NAME = "Alarm"` - used in Prowl notification as the App name or title of the notification
+ * `PROWL_ENABLED = false` - change this to true to enable alert sending via prowl
+ * `PROWL_API_KEY = ""` - enter your Prowl API keys here, a comma separated list
+ * `PUSHOVER_ENABLED = false` - change this to true to enable alert sending via pushover
+ * `PUSHOVER_API_KEY = ""` - enter your Pushoever API key
+ * `PUSHOVER_TO = ""` - key to whom to send the notification
+ * `TWILIO_ENABLED = false` - change this to true to enable alert sending via twilio
+ * `TWILIO_ACCOUNT_SID = ""` - your twilio application sid
+ * `TWILIO_AUTH_TOKEN = ""` - application authentication key
+ * `TWILIO_FROM = "+1x"` - phone number from where the notifications are sent
+ * `TWILIO_TO = "+372x"` - phone number to whom the notifications are sent
 
 ### Run alarm-notifier
 
@@ -54,7 +58,7 @@ Make sure you have sufficient rights to `jaga-cored` spool files.
     Log entry added
     Remaining PROWL API calls for the current hour: 999
 
-# License #
+# License
 
 Copyright (c) 2014, Sten Feldman
 All rights reserved.
