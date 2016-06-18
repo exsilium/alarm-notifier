@@ -6,6 +6,7 @@ var settings = require('./settings');
 var fs = require('fs');
 var squirrel = require('squirrel');
 var chokidar = require('chokidar');
+var path = require('path');
 
 var prowl;
 var twilio;
@@ -58,7 +59,10 @@ function deleteFile(filePath) {
 }
 
 function main() {
-  var watcher = chokidar.watch(settings.TARGET_DIR, {ignored: /^\./, persistent: true});
+  var watcher = chokidar.watch(settings.TARGET_DIR, {
+    ignored: function(targetPath) {
+      return /(^[.#]|(?:__|~)$)/.test(path.basename(targetPath));
+    }, persistent: true});
 
   watcher.on('add', function(filePath) {
     console.log("File add event was received: " + filePath);
