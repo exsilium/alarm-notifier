@@ -1,7 +1,6 @@
 /**
  * Created by exile on 11/01/14.
  */
-const WAIT_ON = "/usr/local/bin/wait_on";
 const TARGET_DIR = "/var/spool/jaga-cored";
 const LOGFILE = "/var/log/jablotron.log";
 const ALARM_NAME = "Alarm";
@@ -23,7 +22,6 @@ const PUSHOVER_API_KEY = "";
 const PUSHOVER_TO = "";
 
 module.exports = {
-    WAIT_ON: WAIT_ON,
     TARGET_DIR: TARGET_DIR,
     LOGFILE: LOGFILE,
     ALARM_NAME: ALARM_NAME,

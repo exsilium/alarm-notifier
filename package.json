@@ -1,6 +1,6 @@
 {
   "name": "alarm-notifier",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Jablotron Alarm Receiver Centre messages handler and notifier",
   "main": "alarm-notifier.js",
   "scripts": {
@@ -17,13 +17,14 @@
     "cli"
   ],
   "author": "Sten Feldman",
-  "license": "BSD",
+  "license": "BSD-2-Clause",
   "repository" : {
     "type" : "git",
     "url" : "https://github.com/exsilium/alarm-notifier.git"
   },
   "dependencies": {
-    "squirrel": "1.0.x"
+    "squirrel": "1.0.x",
+    "chokidar": "1.5.x"
   },
   "pluginDependencies": {
     "node-prowl": "0.1.x",
