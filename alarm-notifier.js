@@ -117,10 +117,10 @@ function main() {
         prowl.push(messageToSend, settings.ALARM_NAME, function( err, remaining ){
           if( err ) console.log('ERROR: ' + err.message);
           console.log("========= Prowl sent a message ===========");
-          console.log( 'Message sent: ' + this.filePath);
+          console.log( 'Message sent: ' + filePath);
           console.log( 'Remaining PROWL API calls for the current hour: ' + remaining);
           console.log("===========================================");
-        }).bind( {filePath: filePath});
+        });
       }
       if(settings.TWILIO_ENABLED) {
         twilio.sendMessage({
